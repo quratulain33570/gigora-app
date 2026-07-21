@@ -1,0 +1,6 @@
+.env
+*.env
+gigora-backend/.env
+gigora-backend/__pycache__/
+__pycache__/
+*.pyc
