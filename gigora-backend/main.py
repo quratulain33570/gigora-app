@@ -1,17 +1,27 @@
-from fastapi import FastAPI
-from dotenv import load_dotenv
-from ai_service import generate_proposal
-
-# Load environment variables from .env
-load_dotenv()
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+from ai_service import analyze_profile
 
 app = FastAPI()
 
-@app.get("/")
-def read_root():
-    return {"message": "Gigora Backend API is running! 🚀"}
+# Enable CORS for React frontend
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-@app.post("/api/proposal")
-def create_proposal(data: dict):
-    result = generate_proposal(data["job_post"])
-    return {"proposal": result}
+class ProfileRequest(BaseModel):
+    profile_text: str
+
+@app.post("/api/profile")
+def get_profile_analysis(request: ProfileRequest):
+    try:
+        if not request.profile_text.strip():
+            raise HTTPException(status_code=400, detail="Profile text cannot be empty.")
+        return analyze_profile(request.profile_text)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

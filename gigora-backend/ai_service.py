@@ -1,23 +1,32 @@
 import os
+import json
 from dotenv import load_dotenv
 from groq import Groq
 
-# 1. Load the variables FIRST!
+# 🔑 Load variables from .env file into os.environ
 load_dotenv()
 
-# 2. THEN initialize the client
-client = Groq(api_key=os.getenv('GROQ_API_KEY'))
+client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
-def generate_proposal(job_post: str) -> str:
-    completion = client.chat.completions.create(
+def analyze_profile(profile_text: str) -> dict:
+    prompt = f"""Analyze this freelancer profile and return JSON only:
+{profile_text}
+
+Return this exact JSON format:
+{{
+  "score": 7,
+  "strengths": ["point 1", "point 2"],
+  "weaknesses": ["point 1", "point 2"],
+  "suggestions": ["action 1", "action 2"]
+}}"""
+
+    response = client.chat.completions.create(
         model="llama-3.3-70b-versatile",
         messages=[
-            {
-                "role": "user",
-                "content": f"You are an expert freelancer proposal writer. Write a professional, personalized proposal for this job:\n{job_post}\nMake it compelling, specific, and under 200 words."
-            }
+            {"role": "user", "content": prompt}
         ],
-        temperature=0.7,
-        max_tokens=1000
+        response_format={"type": "json_object"}
     )
-    return completion.choices[0].message.content
+
+    content = response.choices[0].message.content
+    return json.loads(content)
