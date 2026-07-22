@@ -23,6 +23,9 @@ const cardVariants = {
 };
 
 export default function DashboardHome({ setActiveTab, userName = "Freelancer" }) {
+  // 🛡️ Fallback for safe display name
+  const safeName = userName?.trim() || "Freelancer";
+
   const featureCards = [
     {
       id: 'profile',
@@ -74,7 +77,7 @@ export default function DashboardHome({ setActiveTab, userName = "Freelancer" })
 
           {/* Heading */}
           <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tight mb-3 text-white">
-            Welcome back, <span className="bg-gradient-to-r from-blue-300 via-indigo-200 to-emerald-300 bg-clip-text text-transparent">{userName}</span>! 👋
+            Welcome back, <span className="bg-gradient-to-r from-blue-300 via-indigo-200 to-emerald-300 bg-clip-text text-transparent">{safeName}</span>! 👋
           </h1>
 
           {/* Description */}
@@ -117,13 +120,21 @@ export default function DashboardHome({ setActiveTab, userName = "Freelancer" })
                 whileHover={{ y: -6, transition: { duration: 0.2 } }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => setActiveTab(card.id)}
-                className="bg-white rounded-2xl p-5 sm:p-6 border border-gray-100 shadow-xs hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col justify-between group hover:border-primary/20 relative overflow-hidden select-none"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setActiveTab(card.id);
+                  }
+                }}
+                role="button"
+                tabIndex={0}
+                className="bg-white rounded-2xl p-5 sm:p-6 border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col justify-between group hover:border-primary/20 relative overflow-hidden select-none focus:outline-none focus:ring-2 focus:ring-primary/40"
               >
                 <div>
                   <div className="flex items-center justify-between mb-4">
                     <motion.div 
                       whileHover={{ scale: 1.1, rotate: 5 }}
-                      className={`w-12 h-12 rounded-xl flex items-center justify-center border ${card.color} shadow-2xs transition-transform`}
+                      className={`w-12 h-12 rounded-xl flex items-center justify-center border ${card.color} shadow-xs transition-transform`}
                     >
                       <Icon className="w-6 h-6" />
                     </motion.div>

@@ -17,10 +17,15 @@ export default function DashboardLayout({ children, activeTab, setActiveTab, use
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const navigate = useNavigate();
 
-  // Handle Sign Out & Redirect
+  // Handle Sign Out & Redirect safely 🛡️
   const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    navigate('/login');
+    try {
+      await supabase.auth.signOut();
+    } catch (error) {
+      console.error('Error signing out:', error);
+    } finally {
+      navigate('/login');
+    }
   };
 
   const menuItems = [
@@ -30,8 +35,11 @@ export default function DashboardLayout({ children, activeTab, setActiveTab, use
     { id: 'proposal', label: 'Proposal Generator', icon: FileText },
   ];
 
+  // Safe user initial extraction 👤
+  const userInitial = (userName?.trim() || 'F').charAt(0).toUpperCase();
+
   return (
-    <div className="min-h-screen min-h-[100dvh] bg-slate-50 flex flex-col lg:flex-row overflow-x-hidden">
+    <div className="min-h-screen min-h-[100dvh] bg-slate-50 flex flex-col lg:flex-row w-full max-w-full">
       
       {/* 1️⃣ MOBILE BACKDROP OVERLAY */}
       <AnimatePresence>
@@ -63,6 +71,10 @@ export default function DashboardLayout({ children, activeTab, setActiveTab, use
           <div className="p-4 sm:p-6 flex items-center justify-between border-b border-gray-100 shrink-0">
             <motion.div 
               whileHover={{ scale: 1.02 }}
+              onClick={() => {
+                setActiveTab('home');
+                setSidebarOpen(false);
+              }}
               className="flex items-center gap-2 cursor-pointer select-none"
             >
               <motion.div whileHover={{ rotate: 180, scale: 1.15 }} transition={{ duration: 0.3 }}>
@@ -74,7 +86,7 @@ export default function DashboardLayout({ children, activeTab, setActiveTab, use
             {/* Mobile Close Button */}
             <motion.button 
               whileTap={{ scale: 0.9 }}
-              className="lg:hidden text-gray-400 hover:text-navy p-1.5 rounded-lg hover:bg-slate-100 transition"
+              className="lg:hidden text-gray-400 hover:text-navy p-1.5 rounded-lg hover:bg-slate-100 transition cursor-pointer"
               onClick={() => setSidebarOpen(false)}
               aria-label="Close menu"
             >
@@ -128,9 +140,9 @@ export default function DashboardLayout({ children, activeTab, setActiveTab, use
               <motion.div 
                 whileHover={{ rotate: 360 }}
                 transition={{ duration: 0.6 }}
-                className="w-9 h-9 rounded-full bg-primary/20 text-primary flex items-center justify-center font-bold text-sm shrink-0"
+                className="w-9 h-9 rounded-full bg-primary/20 text-primary flex items-center justify-center font-bold text-sm shrink-0 select-none"
               >
-                {userName.charAt(0).toUpperCase()}
+                {userInitial}
               </motion.div>
               <div className="overflow-hidden min-w-0 flex-1">
                 <p className="text-sm font-semibold text-navy truncate">{userName}</p>
@@ -157,33 +169,27 @@ export default function DashboardLayout({ children, activeTab, setActiveTab, use
         
         {/* Mobile Sticky Header */}
         <header className="lg:hidden bg-white/90 backdrop-blur-md border-b border-gray-100 px-4 py-3 flex items-center justify-between sticky top-0 z-30 shadow-2xs">
-          <div className="flex items-center gap-2">
+          <div 
+            onClick={() => setActiveTab('home')}
+            className="flex items-center gap-2 cursor-pointer"
+          >
             <Sparkles className="w-6 h-6 text-primary" />
             <span className="text-xl font-bold text-navy tracking-tight">GIGORA</span>
           </div>
           <motion.button 
             whileTap={{ scale: 0.9 }}
             onClick={() => setSidebarOpen(true)}
-            className="p-2 text-navy hover:bg-slate-50 rounded-lg transition focus:outline-hidden"
+            className="p-2 text-navy hover:bg-slate-50 rounded-lg transition focus:outline-hidden cursor-pointer"
             aria-label="Open menu"
           >
             <Menu className="w-6 h-6" />
           </motion.button>
         </header>
 
-        {/* Dynamic Animated Page Content */}
-        <AnimatePresence mode="wait">
-          <motion.main 
-            key={activeTab}
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -12 }}
-            transition={{ duration: 0.2, ease: 'easeOut' }}
-            className="flex-1 p-4 sm:p-6 md:p-8 lg:p-10 max-w-7xl w-full mx-auto"
-          >
-            {children}
-          </motion.main>
-        </AnimatePresence>
+        {/* Clean Main Container (Transitions managed seamlessly by DashboardPage!) 🌟 */}
+        <main className="flex-1 p-4 sm:p-6 md:p-8 lg:p-10 max-w-7xl w-full mx-auto">
+          {children}
+        </main>
 
       </div>
     </div>

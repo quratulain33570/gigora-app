@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
-import { Eye, EyeOff, Mail, Lock, User, Sparkles, Check, X } from 'lucide-react';
+import Logo from '../components/Logo'; // 👈 Exact app logo!
+import { Eye, EyeOff, Mail, Lock, User, Check, X } from 'lucide-react';
 
 export default function Signup() {
   const [name, setName] = useState('');
@@ -11,6 +12,22 @@ export default function Signup() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+
+  // 🧹 Reset inputs and clear browser autofill credentials on refresh
+  useEffect(() => {
+    setName('');
+    setEmail('');
+    setPassword('');
+    setShowPassword(false);
+
+    const clearAutofillTimer = setTimeout(() => {
+      setName('');
+      setEmail('');
+      setPassword('');
+    }, 100);
+
+    return () => clearTimeout(clearAutofillTimer);
+  }, []);
 
   // Password Strength Validation Rules
   const passwordConditions = [
@@ -27,7 +44,7 @@ export default function Signup() {
     e.preventDefault();
 
     if (!isPasswordStrong) {
-      setError('Please make sure your password meets all strength requirements!');
+      setError('Please make sure your password meets all strength requirements! 🎯');
       return;
     }
 
@@ -65,86 +82,105 @@ export default function Signup() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
-        <div className="inline-flex items-center gap-2 mb-2">
-          <Sparkles className="w-8 h-8 text-primary" />
-          <span className="text-3xl font-extrabold text-navy tracking-tight">GIGORA</span>
+    <div className="min-h-[calc(100vh-4rem)] bg-slate-50/60 flex flex-col justify-center py-10 sm:px-6 lg:px-8 relative overflow-hidden">
+      {/* Background Soft Glow Accents */}
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-indigo-200/40 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-10 right-10 w-72 h-72 bg-purple-200/40 rounded-full blur-3xl pointer-events-none" />
+
+      {/* Header with Exact App Logo */}
+      <div className="sm:mx-auto sm:w-full sm:max-w-md text-center relative z-10 mb-2">
+        <div className="flex justify-center mb-4">
+          <Logo size="lg" />
         </div>
-        <h2 className="text-2xl font-bold text-navy">Create your account</h2>
-        <p className="mt-1 text-sm text-grayText">Start winning more freelance gigs today</p>
+        <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+          Create your account 👋
+        </h2>
+        <p className="mt-1 text-xs sm:text-sm text-slate-500">
+          Start winning more freelance gigs today ✨
+        </p>
       </div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-4 shadow-sm sm:rounded-2xl sm:px-10 border border-gray-100">
+      <div className="mt-6 sm:mx-auto sm:w-full sm:max-w-md relative z-10 px-4 sm:px-0">
+        <div className="bg-white border border-slate-200/80 py-8 px-4 shadow-xl shadow-slate-200/60 rounded-3xl sm:px-10">
           
           {error && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-600 rounded-xl text-sm font-medium">
+            <div className="mb-4 p-3 bg-rose-50 border border-rose-200 text-rose-700 rounded-xl text-xs sm:text-sm font-medium">
               {error}
             </div>
           )}
 
           {/* Registration Form */}
-          <form className="space-y-5" onSubmit={handleSignup}>
+          <form className="space-y-4" onSubmit={handleSignup} autoComplete="off">
+            
+            {/* Name Input */}
             <div>
-              <label className="block text-sm font-semibold text-navy mb-1.5">
+              <label className="block text-xs font-bold text-slate-700 mb-1.5 ml-1">
                 Full Name
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
                   <User className="w-5 h-5" />
                 </div>
                 <input
                   type="text"
+                  name="signup_full_name_fresh"
+                  autoComplete="new-password"
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Your Name"
-                  className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none text-sm font-medium transition"
+                  className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 text-slate-900 placeholder-slate-400 rounded-xl focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 outline-none text-sm font-medium transition cursor-text"
                 />
               </div>
             </div>
 
+            {/* Email Input */}
             <div>
-              <label className="block text-sm font-semibold text-navy mb-1.5">
+              <label className="block text-xs font-bold text-slate-700 mb-1.5 ml-1">
                 Email Address
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
                   <Mail className="w-5 h-5" />
                 </div>
                 <input
                   type="email"
+                  name="signup_email_fresh"
+                  autoComplete="new-password"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@example.com"
-                  className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none text-sm font-medium transition"
+                  className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 text-slate-900 placeholder-slate-400 rounded-xl focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 outline-none text-sm font-medium transition cursor-text"
                 />
               </div>
             </div>
 
+            {/* Password Input */}
             <div>
-              <label className="block text-sm font-semibold text-navy mb-1.5">
+              <label className="block text-xs font-bold text-slate-700 mb-1.5 ml-1">
                 Password
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
                   <Lock className="w-5 h-5" />
                 </div>
                 <input
                   type={showPassword ? "text" : "password"}
+                  name="signup_password_fresh"
+                  autoComplete="new-password"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full pl-10 pr-10 py-2.5 bg-slate-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none text-sm font-medium transition"
+                  className="w-full pl-10 pr-10 py-2.5 bg-slate-50 border border-slate-200 text-slate-900 placeholder-slate-400 rounded-xl focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 outline-none text-sm font-medium transition cursor-text"
                 />
-                {/* Password Eye Displayer */}
+                
+                {/* Password Eye Toggle */}
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-navy transition cursor-pointer"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-indigo-600 transition cursor-pointer"
                 >
                   {showPassword ? (
                     <EyeOff className="w-5 h-5" />
@@ -154,18 +190,18 @@ export default function Signup() {
                 </button>
               </div>
 
-              {/* Password Strength Real-Time Checklist */}
+              {/* Real-Time Password Requirements Box */}
               {password.length > 0 && (
-                <div className="mt-3 p-3 bg-slate-50 rounded-xl border border-gray-100 space-y-1.5 text-xs">
-                  <p className="font-semibold text-navy mb-1">Password Requirements:</p>
+                <div className="mt-3 p-3 bg-slate-50/80 rounded-xl border border-slate-200/80 space-y-1.5 text-xs">
+                  <p className="font-bold text-slate-700 mb-1">Password Requirements:</p>
                   {passwordConditions.map((condition, idx) => (
                     <div key={idx} className="flex items-center gap-2 transition-all">
                       {condition.met ? (
                         <Check className="w-4 h-4 text-emerald-500 shrink-0" />
                       ) : (
-                        <X className="w-4 h-4 text-gray-300 shrink-0" />
+                        <X className="w-4 h-4 text-slate-300 shrink-0" />
                       )}
-                      <span className={condition.met ? 'text-emerald-700 font-medium' : 'text-gray-400'}>
+                      <span className={condition.met ? 'text-emerald-700 font-semibold' : 'text-slate-400'}>
                         {condition.label}
                       </span>
                     </div>
@@ -174,23 +210,23 @@ export default function Signup() {
               )}
             </div>
 
-            {/* Sign Up Button (Exact same styling as Login button) */}
+            {/* Sign Up Button */}
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 px-4 bg-primary text-white font-bold rounded-xl shadow-xs hover:bg-primary/90 transition duration-200 text-sm disabled:opacity-50 cursor-pointer"
+              className="w-full mt-2 py-3 px-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold rounded-xl shadow-md shadow-indigo-500/20 transition duration-200 text-sm disabled:opacity-50 cursor-pointer active:scale-[0.98]"
             >
-              {loading ? 'Creating Account...' : 'Sign Up'}
+              {loading ? 'Creating Account...' : 'Sign Up 🚀'}
             </button>
           </form>
 
           {/* Divider */}
           <div className="mt-6 relative">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-200" />
+              <div className="w-full border-t border-slate-200" />
             </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white px-3 text-gray-400 font-medium">Or continue with</span>
+            <div className="relative flex justify-center text-[10px] uppercase font-bold tracking-wider">
+              <span className="bg-white px-3 text-slate-400">Or continue with</span>
             </div>
           </div>
 
@@ -199,34 +235,34 @@ export default function Signup() {
             <button
               onClick={handleGoogleSignup}
               type="button"
-              className="w-full flex items-center justify-center gap-3 px-4 py-2.5 border border-gray-200 rounded-xl bg-white text-sm font-semibold text-navy hover:bg-slate-50 transition duration-200 cursor-pointer shadow-xs"
+              className="w-full flex items-center justify-center gap-3 px-4 py-2.5 border border-slate-200 rounded-xl bg-white hover:bg-slate-50 text-slate-700 text-sm font-semibold transition duration-200 cursor-pointer shadow-xs active:scale-[0.98]"
             >
-              <svg className="w-5 h-5" viewBox="0 0 24 24">
+              <svg className="w-4 h-4" viewBox="0 0 24 24">
                 <path
-                  fill="#4285F4"
-                  d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                  fill="#EA4335"
+                  d="M12 5c1.6 0 3 .6 4.1 1.6l3.1-3.1C17.3 1.7 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.2 9 5 12 5z"
                 />
                 <path
-                  fill="#34A853"
-                  d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                  fill="#4285F4"
+                  d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.8z"
                 />
                 <path
                   fill="#FBBC05"
-                  d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
+                  d="M5.6 14.8c-.2-.7-.4-1.5-.4-2.3s.2-1.6.4-2.3L1.9 7.3C.7 9.7 0 10.8 0 12s.7 2.3 1.9 4.7l3.7-2.9z"
                 />
                 <path
-                  fill="#EA4335"
-                  d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
+                  fill="#34A853"
+                  d="M12 23c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2.2-6.4-5.2L1.9 16C3.7 19.7 7.5 23 12 23z"
                 />
               </svg>
               Sign up with Google
             </button>
           </div>
 
-          {/* Already have an account? Sign in link */}
-          <div className="mt-6 text-center text-sm text-grayText">
+          {/* Already have an account link */}
+          <div className="mt-6 text-center text-xs text-slate-500">
             Already have an account?{' '}
-            <Link to="/login" className="font-semibold text-primary hover:underline">
+            <Link to="/login" className="font-bold text-indigo-600 hover:text-indigo-700 underline-offset-2 hover:underline">
               Sign in
             </Link>
           </div>
