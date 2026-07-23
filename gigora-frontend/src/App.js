@@ -4,6 +4,7 @@ import SeoOptimizer from './pages/SeoOptimizer';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Dashboard from './pages/DashboardPage';
+import Landing from './pages/Landing';
 import { Toaster } from 'react-hot-toast';
 
 // Helper component to handle conditional layout
@@ -21,6 +22,7 @@ function MainLayout() {
         <Routes>
           {/* Default Route */}
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/landing" element={<Landing />} />
 
           {/* App Routes */}
           <Route path="/dashboard" element={<Dashboard />} />

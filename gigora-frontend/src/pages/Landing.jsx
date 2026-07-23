@@ -53,7 +53,7 @@ export default function Landing() {
 
         <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
           <Link 
-            to="/analyzer" 
+            to="/dashboard"
             className="bg-primary hover:bg-navy text-white px-5 py-2.5 rounded-lg font-semibold transition shadow-sm inline-block"
           >
             Get Started
@@ -101,7 +101,7 @@ export default function Landing() {
           >
             <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} className="w-full sm:w-auto">
               <Link 
-                to="/analyzer" 
+                to="/dashboard"
                 className="w-full sm:w-auto bg-primary hover:bg-navy text-white px-8 py-3.5 rounded-lg font-bold text-lg transition-all flex items-center justify-center gap-2 shadow-lg shadow-indigo-200 group"
               >
                 Get Started Free 
@@ -205,7 +205,7 @@ export default function Landing() {
         >
           {/* Solution 1 */}
           <motion.div variants={fadeInUp} whileHover={{ y: -8 }} transition={{ duration: 0.2 }}>
-            <Link to="/analyzer" className="bg-lightBlue p-8 rounded-2xl border border-blue-100 hover:shadow-xl transition-all block group h-full">
+            <Link to="/dashboard" className="bg-lightBlue p-8 rounded-2xl border border-blue-100 hover:shadow-xl transition-all block group h-full">
               <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform">
                 <UserCheck className="w-6 h-6" />
               </div>
