@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Sparkles, 
@@ -15,8 +15,9 @@ import {
   AlertCircle
 } from 'lucide-react';
 
-// 🌐 Import your backend API helper!
+// 🌐 Import backend API helper
 import { optimizeGigSeoApi } from '../services/api';
+import { toast } from 'react-hot-toast';
 
 export default function GigSeoOptimizer() {
   const [gigTitle, setGigTitle] = useState('');
@@ -25,12 +26,39 @@ export default function GigSeoOptimizer() {
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState(null);
   const [copiedField, setCopiedField] = useState(null);
-  const [error, setError] = useState(null); // ⚠️ Error state for API feedback
+  const [error, setError] = useState(null);
+  const titleTooLong = gigTitle.length > 80;
+
+  // 📜 Ref for auto-scrolling to output on mobile
+  const resultsRef = useRef(null);
+
+  // 🛡️ Helper to guarantee arrays even if API returns comma-separated strings
+  const ensureArray = (val) => {
+    if (Array.isArray(val)) return val;
+    if (typeof val === 'string') {
+      return val.split(',').map((s) => s.trim()).filter(Boolean);
+    }
+    return [];
+  };
+
+  const normalizeTags = (tags) => ensureArray(tags).map((tag) => (
+    typeof tag === 'string'
+      ? { text: tag, valid: true }
+      : { text: tag?.text || '', valid: Boolean(tag?.valid) }
+  )).filter((tag) => tag.text);
+
+  const getScore = (data, key) => {
+    const value = data?.seo_scores?.[key]
+      ?? data?.scores?.[key]
+      ?? data?.[`${key}_score`]
+      ?? data?.[`${key}Score`];
+    return typeof value === 'number' ? Math.max(0, Math.min(100, value)) : null;
+  };
 
   // 🎯 Handles form submission and triggers live API optimization
   const handleOptimize = async (e) => {
     e.preventDefault();
-    if (!gigTitle.trim()) return;
+    if (!gigTitle.trim() || titleTooLong) return;
 
     setLoading(true);
     setError(null);
@@ -43,14 +71,27 @@ export default function GigSeoOptimizer() {
         description,
       });
 
-      // Map backend response fields safely to your UI state
-      setResults({
-        seoScore: data.seo_score ?? data.seoScore ?? 92,
+      // Safely map response fields
+      const parsedResults = {
+        seoScore: data.seo_score ?? data.seoScore ?? null,
+        scoreBreakdown: {
+          title: getScore(data, 'title'),
+          tags: getScore(data, 'tags'),
+          description: getScore(data, 'description'),
+        },
         optimizedTitle: data.optimized_title || data.optimizedTitle || gigTitle,
-        suggestedTags: data.suggested_tags || data.suggestedTags || [],
-        keywordsToInclude: data.keywords || data.keywordsToInclude || [],
+        suggestedTags: normalizeTags(data.tags || data.suggested_tags || data.suggestedTags),
+        keywordsToInclude: ensureArray(data.keywords || data.keywordsToInclude || data.keywords_to_include),
         optimizedDescription: data.optimized_description || data.optimizedDescription || description,
-      });
+      };
+
+      setResults(parsedResults);
+
+      // 📱 Smooth scroll to results on smaller screens
+      setTimeout(() => {
+        resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 100);
+
     } catch (err) {
       console.error('SEO API Error:', err);
       setError(err.message || 'Could not connect to backend server. Make sure FastAPI is running! 🚨');
@@ -60,10 +101,16 @@ export default function GigSeoOptimizer() {
   };
 
   // 📋 Copy Helper Function
-  const handleCopy = (text, fieldKey) => {
-    navigator.clipboard.writeText(text);
-    setCopiedField(fieldKey);
-    setTimeout(() => setCopiedField(null), 2000);
+  const handleCopy = async (text, fieldKey) => {
+    if (!text) return;
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedField(fieldKey);
+      toast.success('Copied!');
+      setTimeout(() => setCopiedField(null), 2000);
+    } catch {
+      toast.error('Unable to copy.');
+    }
   };
 
   return (
@@ -140,19 +187,23 @@ export default function GigSeoOptimizer() {
                 <label className="text-xs font-bold text-slate-700">
                   Gig Title <span className="text-rose-500">*</span>
                 </label>
-                <span className="text-[10px] text-slate-400 font-semibold">
-                  {gigTitle.length}/80 chars
+                <span className={`text-[10px] font-semibold ${titleTooLong ? 'text-rose-600' : 'text-slate-400'}`}>
+                  {gigTitle.length} / 80
                 </span>
               </div>
               <input
                 type="text"
                 required
-                maxLength={80}
                 value={gigTitle}
                 onChange={(e) => setGigTitle(e.target.value)}
                 placeholder="e.g., I will build a responsive React web app"
                 className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-slate-900 placeholder-slate-400 rounded-xl focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 outline-none text-sm font-medium transition cursor-text"
               />
+              {titleTooLong && (
+                <p className="mt-1.5 text-xs font-semibold text-rose-600" role="alert">
+                  Your title must be 80 characters or fewer.
+                </p>
+              )}
             </div>
 
             {/* Gig Description */}
@@ -172,7 +223,7 @@ export default function GigSeoOptimizer() {
             {/* Action Button */}
             <button
               type="submit"
-              disabled={loading || !gigTitle.trim()}
+              disabled={loading || !gigTitle.trim() || titleTooLong}
               className="w-full py-3.5 px-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold rounded-xl shadow-lg shadow-indigo-500/20 transition-all duration-200 text-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer active:scale-[0.98] flex items-center justify-center gap-2"
             >
               {loading ? (
@@ -191,7 +242,10 @@ export default function GigSeoOptimizer() {
         </div>
 
         {/* 2️⃣ Output Preview Card (7 cols on desktop) */}
-        <div className="lg:col-span-7 bg-white border border-slate-200/80 p-6 sm:p-7 rounded-3xl shadow-xl shadow-slate-200/50 min-h-[520px] flex flex-col justify-between relative overflow-hidden">
+        <div 
+          ref={resultsRef} 
+          className="lg:col-span-7 bg-white border border-slate-200/80 p-6 sm:p-7 rounded-3xl shadow-xl shadow-slate-200/50 min-h-[520px] flex flex-col justify-between relative overflow-hidden"
+        >
           
           <AnimatePresence mode="wait">
             {!results && !loading && (
@@ -240,7 +294,7 @@ export default function GigSeoOptimizer() {
                 <div className="flex items-center justify-between p-4 bg-emerald-50/80 border border-emerald-200/80 rounded-2xl">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-emerald-500 text-white font-black rounded-xl flex items-center justify-center text-sm shadow-sm">
-                      {results.seoScore}%
+                      {results.seoScore ?? '—'}
                     </div>
                     <div>
                       <h4 className="text-xs font-extrabold text-emerald-950 uppercase tracking-wide">
@@ -256,6 +310,32 @@ export default function GigSeoOptimizer() {
                   </span>
                 </div>
 
+                <div className="space-y-3" aria-label="SEO score breakdown">
+                  {[
+                    { key: 'title', label: 'Title', color: 'bg-indigo-500' },
+                    { key: 'tags', label: 'Tags', color: 'bg-emerald-500' },
+                    { key: 'description', label: 'Description', color: 'bg-amber-500' },
+                  ].map(({ key, label, color }) => {
+                    const score = results.scoreBreakdown[key];
+                    return (
+                      <div key={key}>
+                        <div className="mb-1 flex items-center justify-between text-xs font-semibold text-slate-600">
+                          <span>{label}</span>
+                          <span>{score === null ? 'Not provided' : `${score}%`}</span>
+                        </div>
+                        <div className="h-2 overflow-hidden rounded-full bg-slate-100">
+                          <motion.div
+                            className={`h-full rounded-full ${color}`}
+                            initial={{ width: 0 }}
+                            animate={{ width: `${score ?? 0}%` }}
+                            transition={{ duration: 0.55, ease: 'easeOut' }}
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
                 {/* Optimized Title Field */}
                 <div className="space-y-1.5">
                   <div className="flex justify-between items-center">
@@ -263,6 +343,7 @@ export default function GigSeoOptimizer() {
                       <FileText className="w-3.5 h-3.5 text-indigo-600" /> High-Ranking Title
                     </label>
                     <button
+                      type="button"
                       onClick={() => handleCopy(results.optimizedTitle, 'title')}
                       className="text-xs text-indigo-600 hover:text-indigo-700 font-bold flex items-center gap-1 cursor-pointer transition"
                     >
@@ -279,35 +360,52 @@ export default function GigSeoOptimizer() {
                 </div>
 
                 {/* Suggested Search Tags */}
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-                    <Tag className="w-3.5 h-3.5 text-indigo-600" /> Recommended Search Tags ({results.suggestedTags.length})
-                  </label>
-                  <div className="flex flex-wrap gap-2 pt-1">
-                    {results.suggestedTags.map((tag, idx) => (
-                      <span 
-                        key={idx}
-                        className="px-3 py-1 bg-indigo-50 border border-indigo-100 text-indigo-700 font-bold text-xs rounded-lg flex items-center gap-1 hover:bg-indigo-100 transition cursor-default"
+                {results.suggestedTags.length > 0 && (
+                  <div className="space-y-1.5">
+                    <div className="flex justify-between items-center">
+                      <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                        <Tag className="w-3.5 h-3.5 text-indigo-600" /> Recommended Search Tags ({results.suggestedTags.length})
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => handleCopy(results.suggestedTags.map(({ text }) => text).join(', '), 'tags')}
+                        className="text-xs text-indigo-600 hover:text-indigo-700 font-bold flex items-center gap-1 cursor-pointer transition"
                       >
-                        #{tag}
-                      </span>
-                    ))}
+                        {copiedField === 'tags' ? (
+                          <><Check className="w-3.5 h-3.5 text-emerald-600" /> Copied All!</>
+                        ) : (
+                          <><Copy className="w-3.5 h-3.5" /> Copy Tags</>
+                        )}
+                      </button>
+                    </div>
+                    <div className="flex flex-wrap gap-2 pt-1">
+                      {results.suggestedTags.map((tag, idx) => (
+                        <span 
+                          key={idx}
+                          className={`px-3 py-1 border font-bold text-xs rounded-full flex items-center gap-1 ${tag.valid ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-rose-50 border-rose-200 text-rose-700'}`}
+                        >
+                          {tag.text}
+                        </span>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
 
                 {/* High Intent Keywords */}
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-                    <Lightbulb className="w-3.5 h-3.5 text-amber-500" /> High Intent Buyer Keywords
-                  </label>
-                  <div className="flex flex-wrap gap-2">
-                    {results.keywordsToInclude.map((kw, idx) => (
-                      <span key={idx} className="px-2.5 py-1 bg-slate-100 border border-slate-200 text-slate-700 font-medium text-xs rounded-md">
-                        {kw}
-                      </span>
-                    ))}
+                {results.keywordsToInclude.length > 0 && (
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                      <Lightbulb className="w-3.5 h-3.5 text-amber-500" /> High Intent Buyer Keywords
+                    </label>
+                    <div className="flex flex-wrap gap-2">
+                      {results.keywordsToInclude.map((kw, idx) => (
+                        <span key={idx} className="px-2.5 py-1 bg-slate-100 border border-slate-200 text-slate-700 font-medium text-xs rounded-md">
+                          {String(kw)}
+                        </span>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
 
                 {/* Optimized Description */}
                 <div className="space-y-1.5">
@@ -316,6 +414,7 @@ export default function GigSeoOptimizer() {
                       <Sparkles className="w-3.5 h-3.5 text-indigo-600" /> Optimized Description
                     </label>
                     <button
+                      type="button"
                       onClick={() => handleCopy(results.optimizedDescription, 'desc')}
                       className="text-xs text-indigo-600 hover:text-indigo-700 font-bold flex items-center gap-1 cursor-pointer transition"
                     >
@@ -329,6 +428,17 @@ export default function GigSeoOptimizer() {
                   <pre className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 text-xs font-sans whitespace-pre-wrap leading-relaxed max-h-52 overflow-y-auto">
                     {results.optimizedDescription}
                   </pre>
+                </div>
+
+                <div className="flex justify-end">
+                  <button
+                    type="button"
+                    onClick={() => handleOptimize()}
+                    disabled={loading || titleTooLong}
+                    className="min-h-12 rounded-xl border border-indigo-200 px-4 text-sm font-bold text-indigo-700 transition hover:bg-indigo-50 disabled:opacity-50"
+                  >
+                    <RefreshCw className="mr-1 inline h-4 w-4" /> Regenerate
+                  </button>
                 </div>
               </motion.div>
             )}

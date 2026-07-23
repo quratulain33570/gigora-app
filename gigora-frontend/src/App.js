@@ -4,6 +4,7 @@ import SeoOptimizer from './pages/SeoOptimizer';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Dashboard from './pages/DashboardPage';
+import { Toaster } from 'react-hot-toast';
 
 // Helper component to handle conditional layout
 function MainLayout() {
@@ -36,6 +37,7 @@ export default function App() {
   return (
     <Router>
       <MainLayout />
+      <Toaster position="top-right" toastOptions={{ duration: 2500 }} />
     </Router>
   );
 }
