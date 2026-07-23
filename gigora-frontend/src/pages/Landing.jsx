@@ -238,6 +238,29 @@ export default function Landing() {
         </motion.div>
       </section>
 
+      <section id="pricing" className="bg-slate-50 px-6 py-20 border-t border-slate-100">
+        <div className="mx-auto max-w-4xl text-center">
+          <span className="text-sm font-bold uppercase tracking-widest text-indigo-600">Straightforward pricing</span>
+          <h2 className="mt-2 text-3xl font-extrabold text-navy sm:text-4xl">Start free. Upgrade when you grow.</h2>
+          <p className="mx-auto mt-3 max-w-xl text-slate-600">No confusing tiers—just the tools you need to win better freelance work.</p>
+          <div className="mt-10 grid gap-5 text-left md:grid-cols-2">
+            <article className="rounded-3xl border border-slate-200 bg-white p-7 shadow-sm">
+              <p className="text-sm font-bold uppercase tracking-wide text-slate-500">Free Plan</p>
+              <p className="mt-3 text-3xl font-black text-navy">Free</p>
+              <p className="mt-3 text-base font-semibold text-slate-700">5 uses/day <span className="font-normal text-slate-500">— attract users</span></p>
+              <Link to="/signup" className="mt-7 inline-flex min-h-12 w-full items-center justify-center rounded-xl border border-indigo-200 px-5 font-bold text-indigo-700 transition hover:bg-indigo-50">Get started free</Link>
+            </article>
+            <article className="relative rounded-3xl bg-gradient-to-br from-indigo-600 to-violet-700 p-7 text-white shadow-xl shadow-indigo-300/50">
+              <span className="absolute right-5 top-5 rounded-full bg-white/15 px-3 py-1 text-xs font-bold">Best value</span>
+              <p className="text-sm font-bold uppercase tracking-wide text-indigo-100">Pro Plan</p>
+              <p className="mt-3 text-3xl font-black">$5<span className="text-base font-semibold text-indigo-100">/month</span></p>
+              <p className="mt-3 text-base font-semibold">Unlimited access</p>
+              <Link to="/signup" className="mt-7 inline-flex min-h-12 w-full items-center justify-center rounded-xl bg-white px-5 font-bold text-indigo-700 transition hover:bg-indigo-50">Choose Pro</Link>
+            </article>
+          </div>
+        </div>
+      </section>
+
       {/* 5️⃣ FOOTER */}
       <footer className="bg-navy text-white py-12 px-6">
         <div className="max-w-5xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6 border-b border-gray-700 pb-8 mb-6">

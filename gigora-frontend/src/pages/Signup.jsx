@@ -82,7 +82,7 @@ export default function Signup() {
   };
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-slate-50/60 flex flex-col justify-center py-10 sm:px-6 lg:px-8 relative overflow-hidden">
+    <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-br from-slate-50 via-indigo-50/40 to-violet-50 flex flex-col justify-center py-10 sm:px-6 lg:px-8 relative overflow-hidden">
       {/* Background Soft Glow Accents */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-indigo-200/40 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-10 right-10 w-72 h-72 bg-purple-200/40 rounded-full blur-3xl pointer-events-none" />
@@ -101,7 +101,7 @@ export default function Signup() {
       </div>
 
       <div className="mt-6 sm:mx-auto sm:w-full sm:max-w-md relative z-10 px-4 sm:px-0">
-        <div className="bg-white border border-slate-200/80 py-8 px-4 shadow-xl shadow-slate-200/60 rounded-3xl sm:px-10">
+        <div className="bg-white/95 border border-white py-8 px-4 shadow-2xl shadow-indigo-900/10 rounded-3xl sm:px-10">
           
           {error && (
             <div className="mb-4 p-3 bg-rose-50 border border-rose-200 text-rose-700 rounded-xl text-xs sm:text-sm font-medium">
@@ -129,7 +129,7 @@ export default function Signup() {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Your Name"
-                  className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 text-slate-900 placeholder-slate-400 rounded-xl focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 outline-none text-sm font-medium transition cursor-text"
+                  className="w-full pl-10 pr-4 py-3.5 bg-slate-50 border border-slate-200 text-slate-900 placeholder-slate-400 rounded-xl focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 outline-none text-sm font-medium transition cursor-text"
                 />
               </div>
             </div>
@@ -173,7 +173,7 @@ export default function Signup() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full pl-10 pr-10 py-2.5 bg-slate-50 border border-slate-200 text-slate-900 placeholder-slate-400 rounded-xl focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 outline-none text-sm font-medium transition cursor-text"
+                  className="w-full pl-10 pr-10 py-3.5 bg-slate-50 border border-slate-200 text-slate-900 placeholder-slate-400 rounded-xl focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 outline-none text-sm font-medium transition cursor-text"
                 />
                 
                 {/* Password Eye Toggle */}
@@ -214,7 +214,7 @@ export default function Signup() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full mt-2 py-3 px-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold rounded-xl shadow-md shadow-indigo-500/20 transition duration-200 text-sm disabled:opacity-50 cursor-pointer active:scale-[0.98]"
+              className="w-full mt-2 py-3.5 px-4 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-bold rounded-xl shadow-lg shadow-indigo-500/25 transition duration-200 text-sm disabled:opacity-50 cursor-pointer active:scale-[0.98]"
             >
               {loading ? 'Creating Account...' : 'Sign Up 🚀'}
             </button>

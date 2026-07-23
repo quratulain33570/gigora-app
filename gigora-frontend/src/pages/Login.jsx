@@ -104,14 +104,14 @@ export default function Login() {
   };
 
   return (
-    <div className="w-full min-h-[calc(100vh-4rem)] flex items-center justify-center p-4 sm:p-6 bg-slate-50/60 relative overflow-hidden">
+    <div className="w-full min-h-[calc(100vh-4rem)] flex items-center justify-center p-4 sm:p-8 bg-gradient-to-br from-slate-50 via-indigo-50/40 to-violet-50 relative overflow-hidden">
       
       {/* Centered Clean Card (Dashboard Light Theme) */}
       <motion.div 
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
-        className="relative w-full max-w-md bg-white border border-slate-200/80 rounded-3xl p-6 sm:p-8 shadow-xl shadow-slate-200/60 z-20"
+        className="relative w-full max-w-md bg-white/95 border border-white rounded-3xl p-6 sm:p-9 shadow-2xl shadow-indigo-900/10 z-20"
       >
         {/* Soft Ambient Background Glows */}
         <div className="absolute -top-12 -right-12 w-32 h-32 bg-indigo-200/40 rounded-full blur-2xl pointer-events-none"></div>
@@ -119,6 +119,7 @@ export default function Login() {
 
         {/* Header with Exact App Logo */}
         <div className="text-center mb-6 relative z-10">
+          <span className="inline-flex rounded-full bg-indigo-50 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-indigo-700">Secure workspace</span>
           <div className="flex justify-center mb-4">
             <Logo size="lg" />
           </div>
@@ -161,7 +162,7 @@ export default function Login() {
                 placeholder="you@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full pl-4 pr-10 py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition-all cursor-text"
+                className="w-full pl-4 pr-10 py-3.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition-all cursor-text"
                 required
               />
               <div className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
@@ -196,7 +197,7 @@ export default function Login() {
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full pl-4 pr-12 py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition-all cursor-text"
+                className="w-full pl-4 pr-12 py-3.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition-all cursor-text"
                 required
               />
               
@@ -224,7 +225,7 @@ export default function Login() {
           <button 
             type="submit"
             disabled={loading}
-            className="w-full mt-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white py-3 px-4 rounded-xl font-bold text-sm shadow-md shadow-indigo-500/20 transform transition-all active:scale-[0.98] cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="w-full mt-2 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white py-3.5 px-4 rounded-xl font-bold text-sm shadow-lg shadow-indigo-500/25 transform transition-all active:scale-[0.98] cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {loading ? 'Signing in...' : 'Sign In 🚀'}
           </button>
