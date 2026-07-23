@@ -1,284 +1,51 @@
-import React from 'react';
+import { ArrowRight, Bot, Check, ChevronRight, FileText, Menu, Search, Sparkles, UserCheck, X, Zap } from 'lucide-react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { 
-  Sparkles, 
-  TrendingUp, 
-  FileText, 
-  UserCheck, 
-  AlertCircle, 
-  ArrowRight, 
-  Play 
-} from 'lucide-react';
+import Logo from '../components/Logo';
 
-// 🌟 Animation Variants
-const fadeInUp = {
-  hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' } }
-};
-
-const staggerContainer = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.2
-    }
-  }
-};
+const features = [
+  { icon: FileText, title: 'Proposal Generator', text: 'Turn client briefs into confident, tailored proposals in seconds.' },
+  { icon: Search, title: 'Gig SEO Optimizer', text: 'Improve titles, tags, and descriptions with focused marketplace keywords.' },
+  { icon: UserCheck, title: 'Profile Analyzer', text: 'Find the strengths and gaps that matter most to prospective clients.' },
+];
+const benefits = ['Fast AI', 'Professional Results', 'Easy to Use', 'Secure', 'Responsive'];
+const reveal = { hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { duration: 0.45 } } };
 
 export default function Landing() {
-  return (
-    <div className="min-h-screen bg-white text-darkText font-sans overflow-hidden">
-      
-      {/* 1️⃣ NAVBAR */}
-      <motion.nav 
-        initial={{ y: -50, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.5 }}
-        className="flex items-center justify-between px-8 py-4 bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-50"
-      >
-        <div className="flex items-center gap-2 group cursor-pointer">
-          <motion.div whileHover={{ rotate: 180, scale: 1.2 }} transition={{ duration: 0.3 }}>
-            <Sparkles className="w-6 h-6 text-primary" />
-          </motion.div>
-          <span className="text-2xl font-bold text-navy tracking-tight">GIGORA</span>
-        </div>
-        
-        <div className="hidden md:flex items-center space-x-8 font-medium text-grayText">
-          <a href="#features" className="hover:text-primary transition-colors">Features</a>
-          <a href="#pricing" className="hover:text-primary transition-colors">Pricing</a>
-          <Link to="/login" className="hover:text-primary transition-colors">Login</Link>
-        </div>
+  const [menuOpen, setMenuOpen] = useState(false);
+  const closeMenu = () => setMenuOpen(false);
+  return <div className="min-h-screen overflow-x-hidden bg-[#090714] text-white">
+    <header className="sticky top-0 z-50 border-b border-white/10 bg-[#090714]/70 backdrop-blur-xl">
+      <nav className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 sm:px-8" aria-label="Main navigation">
+        <Link to="/" onClick={closeMenu} aria-label="Gigora home"><Logo size="md" showBadge /></Link>
+        <div className="hidden items-center gap-7 text-sm font-medium text-slate-300 md:flex"><a href="#features" className="transition hover:text-white">Features</a><a href="#pricing" className="transition hover:text-white">Pricing</a><a href="#about" className="transition hover:text-white">About</a></div>
+        <div className="hidden items-center gap-3 md:flex"><Link to="/login" className="inline-flex min-h-11 items-center rounded-xl px-4 text-sm font-bold text-slate-200 transition hover:bg-white/10 hover:text-white">Login</Link><Link to="/signup" className="inline-flex min-h-11 items-center rounded-xl bg-gradient-to-r from-violet-500 to-fuchsia-500 px-5 text-sm font-bold text-white shadow-lg shadow-violet-900/40 transition hover:-translate-y-0.5 hover:shadow-violet-700/40">Get Started</Link></div>
+        <button className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-xl border border-white/10 text-white md:hidden" onClick={() => setMenuOpen((value) => !value)} aria-label="Toggle navigation" aria-expanded={menuOpen}>{menuOpen ? <X /> : <Menu />}</button>
+      </nav>
+      {menuOpen && <div className="border-t border-white/10 bg-[#100c22] px-5 py-4 md:hidden"><div className="mx-auto flex max-w-7xl flex-col gap-2 text-sm font-semibold"><a href="#features" onClick={closeMenu} className="rounded-xl px-4 py-3 hover:bg-white/10">Features</a><a href="#pricing" onClick={closeMenu} className="rounded-xl px-4 py-3 hover:bg-white/10">Pricing</a><a href="#about" onClick={closeMenu} className="rounded-xl px-4 py-3 hover:bg-white/10">About</a><Link to="/login" onClick={closeMenu} className="rounded-xl px-4 py-3 hover:bg-white/10">Login</Link><Link to="/signup" onClick={closeMenu} className="rounded-xl bg-violet-600 px-4 py-3 text-center">Get Started</Link></div></div>}
+    </header>
 
-        <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-          <Link 
-            to="/dashboard"
-            className="bg-primary hover:bg-navy text-white px-5 py-2.5 rounded-lg font-semibold transition shadow-sm inline-block"
-          >
-            Get Started
-          </Link>
-        </motion.div>
-      </motion.nav>
+    <main>
+      <section className="relative isolate overflow-hidden"><div className="absolute inset-x-0 top-0 -z-10 h-[38rem] bg-[radial-gradient(ellipse_at_top,rgba(124,58,237,0.35),transparent_65%)]" /><div className="mx-auto grid max-w-7xl gap-12 px-5 py-20 sm:px-8 lg:grid-cols-[1.08fr_.92fr] lg:items-center lg:py-32">
+        <motion.div initial="hidden" animate="show" variants={{ show: { transition: { staggerChildren: 0.1 } } }}><motion.div variants={reveal} className="inline-flex items-center gap-2 rounded-full border border-violet-400/25 bg-violet-400/10 px-3 py-1.5 text-xs font-bold text-violet-200"><Sparkles className="h-3.5 w-3.5" /> AI-native freelance workspace</motion.div><motion.h1 variants={reveal} className="mt-6 max-w-3xl text-5xl font-black tracking-[-0.05em] text-white sm:text-6xl lg:text-7xl">AI Toolkit <span className="bg-gradient-to-r from-violet-300 via-fuchsia-300 to-pink-300 bg-clip-text text-transparent">For Freelancers</span></motion.h1><motion.p variants={reveal} className="mt-6 max-w-xl text-lg leading-8 text-slate-300">Generate winning proposals, optimize Fiverr gigs, and analyze freelancer profiles—all powered by AI.</motion.p><motion.div variants={reveal} className="mt-8 flex flex-col gap-3 sm:flex-row"><Link to="/signup" className="inline-flex min-h-13 items-center justify-center gap-2 rounded-xl bg-white px-6 font-bold text-slate-900 transition hover:-translate-y-0.5 hover:bg-violet-50">Get Started <ArrowRight className="h-4 w-4" /></Link><Link to="/login" className="inline-flex min-h-13 items-center justify-center rounded-xl border border-white/15 px-6 font-bold text-white transition hover:bg-white/10">Login</Link></motion.div><motion.p variants={reveal} className="mt-5 text-sm text-slate-400">Start with 5 free AI uses every day.</motion.p></motion.div>
+        <motion.div initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.6, delay: 0.2 }} className="relative mx-auto w-full max-w-xl"><div className="rounded-[2rem] border border-white/15 bg-white/[0.07] p-4 shadow-2xl shadow-violet-950/50 backdrop-blur-xl"><div className="rounded-2xl border border-white/10 bg-[#141025] p-5 sm:p-7"><div className="flex items-center justify-between"><div><p className="text-xs font-bold uppercase tracking-[0.18em] text-violet-300">Gigora AI</p><h2 className="mt-2 text-xl font-bold">Your next best pitch</h2></div><div className="rounded-xl bg-violet-500/20 p-3 text-violet-200"><Bot /></div></div><div className="mt-7 space-y-3"><div className="h-3 w-4/5 rounded-full bg-white/10" /><div className="h-3 w-full rounded-full bg-white/10" /><div className="h-3 w-3/5 rounded-full bg-white/10" /></div><div className="mt-7 grid grid-cols-3 gap-3"><MockStat label="Match" value="92%" /><MockStat label="Tone" value="Pro" /><MockStat label="Time" value="10s" /></div></div></div><div className="absolute -left-5 top-16 rounded-2xl border border-white/15 bg-[#211844]/90 p-3 shadow-xl backdrop-blur"><p className="text-xs text-violet-200">SEO score</p><p className="text-xl font-black">86/100</p></div><div className="absolute -right-4 bottom-8 rounded-2xl border border-white/15 bg-[#211844]/90 p-3 shadow-xl backdrop-blur"><p className="text-xs text-violet-200">Proposal ready</p><p className="text-sm font-bold text-emerald-300">Generated</p></div></motion.div>
+      </div></section>
 
-      {/* 2️⃣ HERO SECTION */}
-      <section className="px-6 py-20 text-center max-w-4xl mx-auto">
-        <motion.div
-          initial="hidden"
-          animate="visible"
-          variants={staggerContainer}
-          className="flex flex-col items-center"
-        >
-          {/* Badge */}
-          <motion.span 
-            variants={fadeInUp}
-            whileHover={{ scale: 1.05 }}
-            className="inline-flex items-center gap-2 bg-lightBlue text-primary px-4 py-1.5 rounded-full text-sm font-semibold mb-6 shadow-sm border border-blue-100 cursor-default"
-          >
-            <Sparkles className="w-4 h-4 animate-pulse" /> AI-Powered Freelance Success
-          </motion.span>
+      <section id="features" className="border-y border-white/10 bg-white/[0.025] px-5 py-24 sm:px-8"><SectionHeading eyebrow="Everything you need" title="Purpose-built tools for better freelance work" text="From the first profile impression to the final proposal, Gigora keeps your workflow focused." /><div className="mx-auto mt-12 grid max-w-7xl gap-5 md:grid-cols-3">{features.map(({ icon: Icon, title, text }) => <motion.article whileHover={{ y: -6 }} key={title} className="group rounded-3xl border border-white/10 bg-white/[0.05] p-7 shadow-lg shadow-black/10 transition hover:border-violet-400/35 hover:bg-white/[0.08]"><div className="inline-flex rounded-2xl bg-gradient-to-br from-violet-500 to-fuchsia-500 p-3 text-white shadow-lg shadow-violet-900/40"><Icon className="h-6 w-6" /></div><h3 className="mt-6 text-xl font-bold">{title}</h3><p className="mt-3 leading-7 text-slate-300">{text}</p><span className="mt-6 inline-flex items-center gap-1 text-sm font-bold text-violet-300">Explore tool <ChevronRight className="h-4 w-4 transition group-hover:translate-x-1" /></span></motion.article>)}</div></section>
 
-          {/* Heading */}
-          <motion.h1 
-            variants={fadeInUp}
-            className="text-4xl md:text-6xl font-extrabold text-navy leading-tight mb-6"
-          >
-            Win Every Gig with <span className="text-primary bg-gradient-to-r from-primary to-indigo-500 bg-clip-text text-transparent">AI</span>
-          </motion.h1>
+      <section id="about" className="px-5 py-24 sm:px-8"><SectionHeading eyebrow="How it works" title="Three simple steps to stronger client work" /><div className="mx-auto mt-12 grid max-w-6xl gap-5 md:grid-cols-3">{['Create Account', 'Choose Tool', 'Generate Results'].map((step, index) => <div key={step} className="relative rounded-3xl border border-white/10 bg-[#110d20] p-6"><span className="text-sm font-black text-violet-300">0{index + 1}</span><h3 className="mt-6 text-xl font-bold">{step}</h3><p className="mt-2 text-slate-300">{index === 0 ? 'Set up your workspace in moments.' : index === 1 ? 'Pick the AI assistant for the job.' : 'Use clear, polished output with confidence.'}</p>{index < 2 && <ArrowRight className="absolute -right-8 top-1/2 hidden h-6 w-6 text-violet-300 md:block" />}</div>)}</div></section>
 
-          {/* Subtitle */}
-          <motion.p 
-            variants={fadeInUp}
-            className="text-lg md:text-xl text-grayText mb-8 max-w-2xl mx-auto"
-          >
-            Analyze your profile, optimize your gig SEO, and generate winning proposals in seconds with our AI engine.
-          </motion.p>
+      <section className="px-5 pb-24 sm:px-8"><div className="mx-auto max-w-7xl rounded-[2rem] border border-white/10 bg-gradient-to-br from-violet-950/60 to-[#141025] p-7 sm:p-10"><SectionHeading eyebrow="Why Gigora" title="More clarity. Less busywork." /><div className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">{benefits.map((benefit) => <div key={benefit} className="rounded-2xl border border-white/10 bg-white/[0.06] p-4 text-sm font-bold text-slate-100"><Check className="mb-3 h-5 w-5 text-violet-300" />{benefit}</div>)}</div></div></section>
 
-          {/* Action Buttons */}
-          <motion.div 
-            variants={fadeInUp}
-            className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto"
-          >
-            <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} className="w-full sm:w-auto">
-              <Link 
-                to="/dashboard"
-                className="w-full sm:w-auto bg-primary hover:bg-navy text-white px-8 py-3.5 rounded-lg font-bold text-lg transition-all flex items-center justify-center gap-2 shadow-lg shadow-indigo-200 group"
-              >
-                Get Started Free 
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </Link>
-            </motion.div>
+      <section id="pricing" className="border-y border-white/10 bg-white/[0.025] px-5 py-24 sm:px-8"><SectionHeading eyebrow="Simple pricing" title="Start free. Upgrade when you grow." text="Everything you need to build a more confident freelance workflow." /><div className="mx-auto mt-12 grid max-w-4xl gap-5 md:grid-cols-2"><PricingCard title="Free" price="Free" detail="5 uses/day" items={['Proposal generation', 'SEO suggestions', 'Profile analysis']} /><PricingCard pro title="Pro" price="$5" detail="per month · unlimited access" items={['Unlimited AI generations', 'Full history access', 'Priority experience']} /></div></section>
 
-            <motion.button 
-              whileHover={{ scale: 1.03 }} 
-              whileTap={{ scale: 0.97 }}
-              className="w-full sm:w-auto border-2 border-gray-200 hover:border-navy text-navy px-8 py-3.5 rounded-lg font-bold text-lg transition flex items-center justify-center gap-2 bg-white"
-            >
-              <Play className="w-5 h-5 fill-navy" /> Watch Demo
-            </motion.button>
-          </motion.div>
-        </motion.div>
-      </section>
-
-      {/* 3️⃣ PROBLEM SECTION */}
-      <section className="py-16 bg-slate-50 border-y border-gray-100 px-6">
-        <div className="max-w-5xl mx-auto">
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-100px' }}
-            transition={{ duration: 0.5 }}
-            className="text-center mb-12"
-          >
-            <h2 className="text-3xl font-bold text-navy mb-3">Struggling on Upwork & Fiverr?</h2>
-            <p className="text-grayText">You're not alone. Most freelancers face these 3 giant roadblocks.</p>
-          </motion.div>
-
-          <motion.div 
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: '-50px' }}
-            variants={staggerContainer}
-            className="grid md:grid-cols-3 gap-6"
-          >
-            {/* Problem Card 1 */}
-            <motion.div 
-              variants={fadeInUp}
-              whileHover={{ y: -6, transition: { duration: 0.2 } }}
-              className="bg-white p-6 rounded-xl border border-red-100 shadow-sm hover:shadow-md transition-shadow"
-            >
-              <div className="w-12 h-12 bg-red-50 rounded-lg flex items-center justify-center text-red-500 mb-4">
-                <AlertCircle className="w-6 h-6" />
-              </div>
-              <h3 className="text-xl font-bold text-navy mb-2">No Clients</h3>
-              <p className="text-grayText text-sm">Sending dozens of applications every week without receiving a single reply or interview invite.</p>
-            </motion.div>
-
-            {/* Problem Card 2 */}
-            <motion.div 
-              variants={fadeInUp}
-              whileHover={{ y: -6, transition: { duration: 0.2 } }}
-              className="bg-white p-6 rounded-xl border border-red-100 shadow-sm hover:shadow-md transition-shadow"
-            >
-              <div className="w-12 h-12 bg-red-50 rounded-lg flex items-center justify-center text-red-500 mb-4">
-                <AlertCircle className="w-6 h-6" />
-              </div>
-              <h3 className="text-xl font-bold text-navy mb-2">Gig Not Ranking</h3>
-              <p className="text-grayText text-sm">Your gigs are buried on page 10 where clients never scroll, missing out on organic impressions.</p>
-            </motion.div>
-
-            {/* Problem Card 3 */}
-            <motion.div 
-              variants={fadeInUp}
-              whileHover={{ y: -6, transition: { duration: 0.2 } }}
-              className="bg-white p-6 rounded-xl border border-red-100 shadow-sm hover:shadow-md transition-shadow"
-            >
-              <div className="w-12 h-12 bg-red-50 rounded-lg flex items-center justify-center text-red-500 mb-4">
-                <AlertCircle className="w-6 h-6" />
-              </div>
-              <h3 className="text-xl font-bold text-navy mb-2">Proposals Rejected</h3>
-              <p className="text-grayText text-sm">Generic proposals that get ignored by clients looking for tailor-made solutions.</p>
-            </motion.div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* 4️⃣ SOLUTION SECTION */}
-      <section id="features" className="py-20 px-6 max-w-5xl mx-auto">
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className="text-center mb-12"
-        >
-          <span className="text-primary font-semibold uppercase tracking-wider text-sm">The Solution</span>
-          <h2 className="text-3xl font-bold text-navy mt-1">Supercharge Your Freelance Career</h2>
-        </motion.div>
-
-        <motion.div 
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-50px' }}
-          variants={staggerContainer}
-          className="grid md:grid-cols-3 gap-8"
-        >
-          {/* Solution 1 */}
-          <motion.div variants={fadeInUp} whileHover={{ y: -8 }} transition={{ duration: 0.2 }}>
-            <Link to="/dashboard" className="bg-lightBlue p-8 rounded-2xl border border-blue-100 hover:shadow-xl transition-all block group h-full">
-              <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform">
-                <UserCheck className="w-6 h-6" />
-              </div>
-              <h3 className="text-xl font-bold text-navy mb-2">Profile Analyzer</h3>
-              <p className="text-grayText text-sm">Instant feedback on your profile strengths, weaknesses, and a score out of 10 to stand out.</p>
-            </Link>
-          </motion.div>
-
-          {/* Solution 2 */}
-          <motion.div variants={fadeInUp} whileHover={{ y: -8 }} transition={{ duration: 0.2 }}>
-            <div className="bg-lightBlue p-8 rounded-2xl border border-blue-100 hover:shadow-xl transition-all h-full group">
-              <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform">
-                <TrendingUp className="w-6 h-6" />
-              </div>
-              <h3 className="text-xl font-bold text-navy mb-2">Gig SEO</h3>
-              <p className="text-grayText text-sm">Optimize your titles, tags, and descriptions with high-converting keywords to rank on page 1.</p>
-            </div>
-          </motion.div>
-
-          {/* Solution 3 */}
-          <motion.div variants={fadeInUp} whileHover={{ y: -8 }} transition={{ duration: 0.2 }}>
-            <div className="bg-lightBlue p-8 rounded-2xl border border-blue-100 hover:shadow-xl transition-all h-full group">
-              <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform">
-                <FileText className="w-6 h-6" />
-              </div>
-              <h3 className="text-xl font-bold text-navy mb-2">Proposal Generator</h3>
-              <p className="text-grayText text-sm">Craft compelling, tailored cover letters from job descriptions in under 10 seconds.</p>
-            </div>
-          </motion.div>
-        </motion.div>
-      </section>
-
-      <section id="pricing" className="bg-slate-50 px-6 py-20 border-t border-slate-100">
-        <div className="mx-auto max-w-4xl text-center">
-          <span className="text-sm font-bold uppercase tracking-widest text-indigo-600">Straightforward pricing</span>
-          <h2 className="mt-2 text-3xl font-extrabold text-navy sm:text-4xl">Start free. Upgrade when you grow.</h2>
-          <p className="mx-auto mt-3 max-w-xl text-slate-600">No confusing tiers—just the tools you need to win better freelance work.</p>
-          <div className="mt-10 grid gap-5 text-left md:grid-cols-2">
-            <article className="rounded-3xl border border-slate-200 bg-white p-7 shadow-sm">
-              <p className="text-sm font-bold uppercase tracking-wide text-slate-500">Free Plan</p>
-              <p className="mt-3 text-3xl font-black text-navy">Free</p>
-              <p className="mt-3 text-base font-semibold text-slate-700">5 uses/day <span className="font-normal text-slate-500">— attract users</span></p>
-              <Link to="/signup" className="mt-7 inline-flex min-h-12 w-full items-center justify-center rounded-xl border border-indigo-200 px-5 font-bold text-indigo-700 transition hover:bg-indigo-50">Get started free</Link>
-            </article>
-            <article className="relative rounded-3xl bg-gradient-to-br from-indigo-600 to-violet-700 p-7 text-white shadow-xl shadow-indigo-300/50">
-              <span className="absolute right-5 top-5 rounded-full bg-white/15 px-3 py-1 text-xs font-bold">Best value</span>
-              <p className="text-sm font-bold uppercase tracking-wide text-indigo-100">Pro Plan</p>
-              <p className="mt-3 text-3xl font-black">$5<span className="text-base font-semibold text-indigo-100">/month</span></p>
-              <p className="mt-3 text-base font-semibold">Unlimited access</p>
-              <Link to="/signup" className="mt-7 inline-flex min-h-12 w-full items-center justify-center rounded-xl bg-white px-5 font-bold text-indigo-700 transition hover:bg-indigo-50">Choose Pro</Link>
-            </article>
-          </div>
-        </div>
-      </section>
-
-      {/* 5️⃣ FOOTER */}
-      <footer className="bg-navy text-white py-12 px-6">
-        <div className="max-w-5xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6 border-b border-gray-700 pb-8 mb-6">
-          <div className="flex items-center gap-2">
-            <Sparkles className="w-6 h-6 text-primary" />
-            <span className="text-2xl font-bold tracking-tight">GIGORA</span>
-          </div>
-          <div className="flex space-x-6 text-sm text-gray-300">
-            <a href="#features" className="hover:text-white transition-colors">Features</a>
-            <a href="#pricing" className="hover:text-white transition-colors">Pricing</a>
-            <a href="#privacy" className="hover:text-white transition-colors">Privacy Policy</a>
-          </div>
-        </div>
-        <div className="text-center text-sm text-gray-400">
-          © Mufasa Developers 2026. All rights reserved.
-        </div>
-      </footer>
-
-    </div>
-  );
+      <section className="px-5 py-24 sm:px-8"><div className="mx-auto max-w-6xl rounded-[2rem] bg-gradient-to-r from-violet-600 to-fuchsia-600 px-7 py-14 text-center shadow-2xl shadow-violet-950/40 sm:px-12"><Zap className="mx-auto h-7 w-7" /><h2 className="mx-auto mt-4 max-w-2xl text-3xl font-black tracking-tight sm:text-5xl">Ready to grow your freelance business?</h2><p className="mx-auto mt-4 max-w-xl text-violet-100">Build more compelling work with an AI toolkit that stays out of your way.</p><Link to="/signup" className="mt-8 inline-flex min-h-13 items-center gap-2 rounded-xl bg-white px-6 font-bold text-violet-700 transition hover:-translate-y-0.5 hover:bg-violet-50">Get Started <ArrowRight className="h-4 w-4" /></Link></div></section>
+    </main>
+    <footer className="border-t border-white/10 px-5 py-10 sm:px-8"><div className="mx-auto flex max-w-7xl flex-col gap-7 sm:flex-row sm:items-center sm:justify-between"><Logo size="sm" /><div className="flex flex-wrap gap-x-6 gap-y-3 text-sm text-slate-400"><a href="#about" className="hover:text-white">About</a><a href="mailto:privacy@gigora.app" className="hover:text-white">Privacy</a><a href="mailto:hello@gigora.app" className="hover:text-white">Contact</a></div><p className="text-sm text-slate-500">© 2026 Gigora. All rights reserved.</p></div></footer>
+  </div>;
 }
+
+function MockStat({ label, value }) { return <div className="rounded-xl border border-white/10 bg-white/[0.05] p-3"><p className="text-xs text-slate-400">{label}</p><p className="mt-1 font-bold">{value}</p></div>; }
+function SectionHeading({ eyebrow, title, text }) { return <div className="mx-auto max-w-2xl text-center"><p className="text-sm font-bold uppercase tracking-[0.18em] text-violet-300">{eyebrow}</p><h2 className="mt-3 text-3xl font-black tracking-tight text-white sm:text-4xl">{title}</h2>{text && <p className="mt-4 leading-7 text-slate-300">{text}</p>}</div>; }
+function PricingCard({ title, price, detail, items, pro = false }) { return <article className={`rounded-3xl p-7 ${pro ? 'border border-violet-300/40 bg-gradient-to-br from-violet-600 to-fuchsia-700 shadow-xl shadow-violet-950/40' : 'border border-white/10 bg-[#110d20]'}`}><p className={`text-sm font-bold ${pro ? 'text-violet-100' : 'text-slate-400'}`}>{title} Plan</p><p className="mt-4 text-4xl font-black text-white">{price}</p><p className={`mt-2 text-sm ${pro ? 'text-violet-100' : 'text-slate-300'}`}>{detail}</p><ul className="mt-7 space-y-3">{items.map((item) => <li key={item} className="flex gap-2 text-sm text-white"><Check className="h-5 w-5 shrink-0 text-violet-200" />{item}</li>)}</ul><Link to="/signup" className={`mt-8 inline-flex min-h-12 w-full items-center justify-center rounded-xl px-5 text-sm font-bold transition ${pro ? 'bg-white text-violet-700 hover:bg-violet-50' : 'bg-white/10 text-white hover:bg-white/15'}`}>{pro ? 'Choose Pro' : 'Start Free'}</Link></article>; }

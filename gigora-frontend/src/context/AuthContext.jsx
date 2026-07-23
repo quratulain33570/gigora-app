@@ -13,7 +13,7 @@ export const AuthProvider = ({ children }) => {
       .then(({ data: { session } }) => {
         setUser(session?.user ?? null);
       })
-      .catch((err) => console.error("Supabase session error:", err))
+      .catch(() => setUser(null))
       .finally(() => setLoading(false)); // ALWAYS stop loading! 🛑
 
     // Listen for login/logout changes

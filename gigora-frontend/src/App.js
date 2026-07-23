@@ -1,45 +1,35 @@
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import Navbar from './components/Navbar';
-import SeoOptimizer from './pages/SeoOptimizer';
-import Login from './pages/Login';
-import Signup from './pages/Signup';
+import { BrowserRouter as Router, Navigate, Route, Routes, useLocation } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
 import Dashboard from './pages/DashboardPage';
 import Landing from './pages/Landing';
-import { Toaster } from 'react-hot-toast';
+import Login from './pages/Login';
+import SeoOptimizer from './pages/SeoOptimizer';
+import Signup from './pages/Signup';
+import { useAuth } from './context/AuthContext';
 
-// Helper component to handle conditional layout
-function MainLayout() {
+function ProtectedRoute({ children }) {
+  const { user } = useAuth();
   const location = useLocation();
+  return user ? children : <Navigate to="/login" replace state={{ from: location.pathname }} />;
+}
 
-  // Hide the public top Navbar on dashboard routes! 🛑
-  const isDashboardRoute = location.pathname.startsWith('/dashboard');
+function AuthRoute({ children }) {
+  const { user } = useAuth();
+  return user ? <Navigate to="/dashboard" replace /> : children;
+}
 
-  return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-indigo-500 selection:text-white">
-      {!isDashboardRoute && <Navbar />}
-
-      <main className="flex-1 w-full flex flex-col">
-        <Routes>
-          {/* Default Route */}
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
-          <Route path="/landing" element={<Landing />} />
-
-          {/* App Routes */}
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/seo" element={<SeoOptimizer />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-        </Routes>
-      </main>
-    </div>
-  );
+function AppRoutes() {
+  return <div className="min-h-screen bg-slate-950 font-sans selection:bg-violet-500 selection:text-white"><Routes>
+    <Route path="/" element={<Landing />} />
+    <Route path="/landing" element={<Navigate to="/" replace />} />
+    <Route path="/login" element={<AuthRoute><Login /></AuthRoute>} />
+    <Route path="/signup" element={<AuthRoute><Signup /></AuthRoute>} />
+    <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+    <Route path="/seo" element={<ProtectedRoute><SeoOptimizer /></ProtectedRoute>} />
+    <Route path="*" element={<Navigate to="/" replace />} />
+  </Routes></div>;
 }
 
 export default function App() {
-  return (
-    <Router>
-      <MainLayout />
-      <Toaster position="top-right" toastOptions={{ duration: 2500 }} />
-    </Router>
-  );
+  return <Router><AppRoutes /><Toaster position="top-right" toastOptions={{ duration: 2500 }} /></Router>;
 }
