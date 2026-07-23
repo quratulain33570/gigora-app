@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Sparkles, 
@@ -14,22 +14,27 @@ import {
   AlertCircle
 } from 'lucide-react';
 
-// 🌐 Import your backend API helper!
+// 🌐 Import backend API helper
 import { generateProposalApi } from '../services/api';
+import { toast } from 'react-hot-toast';
 
 export default function ProposalGenerator() {
   const [jobDescription, setJobDescription] = useState('');
   const [clientName, setClientName] = useState('');
-  const [tone, setTone] = useState('Persuasive & High-Value');
+  const [tone, setTone] = useState('Professional');
   const [mySkillHighlight, setMySkillHighlight] = useState('');
+  const [platform, setPlatform] = useState('Fiverr');
   const [loading, setLoading] = useState(false);
   const [proposalResult, setProposalResult] = useState(null);
   const [copied, setCopied] = useState(false);
-  const [error, setError] = useState(null); // ⚠️ Error state for API feedback
+  const [error, setError] = useState(null);
+
+  // 📜 Ref for auto-scrolling to output on mobile
+  const resultsRef = useRef(null);
 
   // 🎯 Handles form submission and triggers real AI Proposal generation
   const handleGenerate = async (e) => {
-    e.preventDefault();
+    e?.preventDefault();
     if (!jobDescription.trim()) return;
 
     setLoading(true);
@@ -49,7 +54,14 @@ export default function ProposalGenerator() {
         matchScore: data.match_score ?? data.matchScore ?? 98,
         estimatedReadTime: data.estimated_read_time || data.estimatedReadTime || '45 seconds',
         coverLetter: data.cover_letter || data.coverLetter || data.proposal || '',
+        keyPoints: Array.isArray(data.key_points) ? data.key_points : [],
       });
+
+      // 📱 Smooth scroll to proposal output on mobile devices
+      setTimeout(() => {
+        resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 100);
+
     } catch (err) {
       console.error('Proposal API Error:', err);
       setError(err.message || 'Could not connect to backend server. Make sure FastAPI is running! 🚨');
@@ -58,12 +70,29 @@ export default function ProposalGenerator() {
     }
   };
 
-  // 📋 Copy Proposal to Clipboard
-  const handleCopy = () => {
-    if (!proposalResult) return;
-    navigator.clipboard.writeText(proposalResult.coverLetter);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  // 📋 Copy Proposal (Grabs live edited content)
+  const handleCopy = async () => {
+    if (!proposalResult?.coverLetter) return;
+    try {
+      await navigator.clipboard.writeText(proposalResult.coverLetter);
+      setCopied(true);
+      toast.success('Copied!');
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      toast.error('Unable to copy.');
+    }
+  };
+
+  const handleDownload = () => {
+    if (!proposalResult?.coverLetter) return;
+    const date = new Date().toISOString().slice(0, 10);
+    const blob = new Blob([proposalResult.coverLetter], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `proposal-${date}.txt`;
+    link.click();
+    URL.revokeObjectURL(url);
   };
 
   return (
@@ -74,7 +103,7 @@ export default function ProposalGenerator() {
         <div className="absolute top-0 right-0 w-64 h-64 bg-purple-200/30 rounded-full blur-3xl pointer-events-none -mr-20 -mt-20" />
         <div className="relative z-10 space-y-1">
           <div className="inline-flex items-center gap-2 px-3 py-1 bg-purple-50 border border-purple-100 rounded-full text-purple-600 text-xs font-bold uppercase tracking-wider mb-1">
-            <Sparkles className="w-3.5 h-3.5" /> AI Client Converter
+            <Sparkles className="w-3.5 h-3.5" /> Gigora Pitch AI
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
             Proposal Generator 📝✨
@@ -116,7 +145,7 @@ export default function ProposalGenerator() {
 
           <form onSubmit={handleGenerate} className="space-y-4">
             
-            {/* Job Description / Textarea */}
+            {/* Job Description Textarea */}
             <div>
               <div className="flex justify-between items-center mb-1.5 ml-1">
                 <label className="text-xs font-bold text-slate-700">
@@ -145,7 +174,7 @@ export default function ProposalGenerator() {
                 type="text"
                 value={clientName}
                 onChange={(e) => setClientName(e.target.value)}
-                placeholder="e.g. Alex or Sarah (adds personal touch!)"
+                placeholder="e.g., Alex or Sarah (adds personal touch!)"
                 className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-slate-900 placeholder-slate-400 rounded-xl focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 outline-none text-sm font-medium transition cursor-text"
               />
             </div>
@@ -153,32 +182,46 @@ export default function ProposalGenerator() {
             {/* Select Proposal Tone */}
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1.5 ml-1">
-                Pitch Tone & Vibe
+                Pitch Tone
               </label>
-              <select
-                value={tone}
-                onChange={(e) => setTone(e.target.value)}
-                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-slate-900 rounded-xl focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 outline-none text-sm font-medium transition cursor-pointer"
-              >
-                <option>Persuasive & High-Value</option>
-                <option>Professional & Formal</option>
-                <option>Short, Punchy & Direct</option>
-                <option>Casual & Friendly</option>
-              </select>
+              <div className="grid grid-cols-3 gap-2" role="group" aria-label="Proposal tone">
+                {['Professional', 'Friendly', 'Confident'].map((option) => (
+                  <button
+                    key={option}
+                    type="button"
+                    onClick={() => setTone(option)}
+                    className={`min-h-12 rounded-xl px-2 text-xs font-bold transition ${tone === option ? 'bg-purple-600 text-white shadow-md shadow-purple-200' : 'bg-slate-50 text-slate-600 hover:bg-purple-50 border border-slate-200'}`}
+                  >
+                    {option}
+                  </button>
+                ))}
+              </div>
             </div>
 
             {/* Main Skill / Portfolio Hook */}
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1.5 ml-1">
-                Key Skill to Highlight <span className="text-slate-400 font-normal">(Optional)</span>
+                Key Skill to Highlight
               </label>
-              <input
-                type="text"
+              <select
                 value={mySkillHighlight}
                 onChange={(e) => setMySkillHighlight(e.target.value)}
-                placeholder="e.g. React.js, Supabase, UI/UX Design"
-                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-slate-900 placeholder-slate-400 rounded-xl focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 outline-none text-sm font-medium transition cursor-text"
-              />
+                className="w-full min-h-12 px-4 py-2.5 bg-slate-50 border border-slate-200 text-slate-900 rounded-xl focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 outline-none text-sm font-medium transition"
+              >
+                <option value="">Select a skill</option>
+                {['Web Development', 'Graphic Design', 'Writing', 'Marketing', 'Mobile Development', 'AI/ML', 'Other'].map((skill) => <option key={skill}>{skill}</option>)}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1.5 ml-1">Platform</label>
+              <div className="grid grid-cols-2 gap-2" role="group" aria-label="Freelance platform">
+                {['Fiverr', 'Upwork'].map((option) => (
+                  <button key={option} type="button" onClick={() => setPlatform(option)} className={`min-h-12 rounded-xl text-sm font-bold transition ${platform === option ? 'bg-purple-600 text-white' : 'bg-slate-50 border border-slate-200 text-slate-600'}`}>
+                    {option}
+                  </button>
+                ))}
+              </div>
             </div>
 
             {/* Submit Action Button */}
@@ -203,7 +246,10 @@ export default function ProposalGenerator() {
         </div>
 
         {/* 2️⃣ Output Cover Letter Card (7 cols on desktop) */}
-        <div className="lg:col-span-7 bg-white border border-slate-200/80 p-6 sm:p-7 rounded-3xl shadow-xl shadow-slate-200/50 min-h-[540px] flex flex-col justify-between relative overflow-hidden">
+        <div 
+          ref={resultsRef}
+          className="lg:col-span-7 bg-white border border-slate-200/80 p-6 sm:p-7 rounded-3xl shadow-xl shadow-slate-200/50 min-h-[540px] flex flex-col justify-between relative overflow-hidden"
+        >
           
           <AnimatePresence mode="wait">
             {!proposalResult && !loading && (
@@ -272,9 +318,10 @@ export default function ProposalGenerator() {
                 <div className="space-y-2">
                   <div className="flex justify-between items-center">
                     <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-                      <FileText className="w-3.5 h-3.5 text-purple-600" /> Ready-to-Send Proposal
+                      <FileText className="w-3.5 h-3.5 text-purple-600" /> Ready-to-Send Proposal (Editable)
                     </label>
                     <button
+                      type="button"
                       onClick={handleCopy}
                       className="text-xs text-indigo-600 hover:text-indigo-700 font-bold flex items-center gap-1 cursor-pointer transition"
                     >
@@ -290,8 +337,28 @@ export default function ProposalGenerator() {
                     rows={12}
                     value={proposalResult.coverLetter}
                     onChange={(e) => setProposalResult({ ...proposalResult, coverLetter: e.target.value })}
-                    className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 text-xs sm:text-sm font-sans leading-relaxed focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 outline-none resize-none"
+                    className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 text-xs sm:text-sm font-sans leading-relaxed focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 outline-none resize-none cursor-text"
                   />
+                </div>
+
+                {proposalResult.keyPoints.length > 0 && (
+                  <div className="space-y-2">
+                    <h5 className="text-xs font-bold text-slate-700">Key points</h5>
+                    <div className="flex flex-wrap gap-2">
+                      {proposalResult.keyPoints.map((point, index) => (
+                        <span key={`${point}-${index}`} className="rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700 ring-1 ring-emerald-200">{point}</span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex flex-col gap-2 sm:flex-row sm:justify-end">
+                  <button type="button" onClick={() => handleGenerate()} disabled={loading} className="min-h-12 rounded-xl border border-indigo-200 px-4 text-sm font-bold text-indigo-700 hover:bg-indigo-50 disabled:opacity-50">
+                    <RefreshCw className="mr-1 inline h-4 w-4" /> Regenerate
+                  </button>
+                  <button type="button" onClick={handleDownload} className="min-h-12 rounded-xl bg-slate-900 px-4 text-sm font-bold text-white hover:bg-slate-800">
+                    Download
+                  </button>
                 </div>
               </motion.div>
             )}
