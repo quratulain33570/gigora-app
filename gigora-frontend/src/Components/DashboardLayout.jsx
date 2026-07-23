@@ -24,8 +24,6 @@ export default function DashboardLayout({ children, activeTab, setActiveTab, use
   const handleSignOut = async () => {
     try {
       await supabase.auth.signOut();
-    } catch (error) {
-      console.error('Error signing out:', error);
     } finally {
       navigate('/login');
     }
@@ -65,7 +63,7 @@ export default function DashboardLayout({ children, activeTab, setActiveTab, use
       <aside 
         className={`
           fixed lg:sticky top-0 inset-y-0 left-0 z-50 
-          w-72 sm:w-64 h-screen h-[100dvh] bg-white border-r border-gray-100 
+          w-72 sm:w-64 h-screen h-[100dvh] bg-white/95 border-r border-slate-200/80 shadow-xl shadow-slate-200/30
           flex flex-col justify-between transition-transform duration-300 ease-in-out shrink-0
           ${sidebarOpen ? 'translate-x-0 shadow-2xl lg:shadow-none' : '-translate-x-full lg:translate-x-0'}
         `}
