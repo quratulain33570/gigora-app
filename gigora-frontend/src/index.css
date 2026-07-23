@@ -4,7 +4,7 @@
 
 @layer base {
   html { scroll-behavior: smooth; }
-  body { @apply m-0 bg-slate-50 font-sans text-slate-900 antialiased; }
+  body { @apply m-0 overflow-x-hidden bg-slate-50 font-sans text-slate-900 antialiased; }
   *, *::before, *::after { box-sizing: border-box; }
   button, input, select, textarea { font: inherit; }
   button, [role='button'], a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
@@ -20,4 +20,18 @@
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: 0.01ms !important; }
+}
+
+@layer components {
+  .auth-page { @apply relative grid min-h-screen place-items-center overflow-hidden bg-[#090714] px-4 py-10; }
+  .auth-card { @apply relative z-10 w-full max-w-md rounded-3xl border border-white/10 bg-white/[0.07] p-6 shadow-2xl shadow-black/30 backdrop-blur-xl sm:p-9; }
+  .auth-orb { @apply pointer-events-none absolute rounded-full blur-3xl; }
+  .auth-orb-one { @apply -left-24 top-8 h-80 w-80 bg-violet-600/35; }
+  .auth-orb-two { @apply -bottom-28 -right-20 h-96 w-96 bg-fuchsia-600/25; }
+  .auth-label { @apply mb-2 block text-xs font-bold uppercase tracking-wide text-slate-300; }
+  .auth-icon { @apply pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 [&>svg]:h-5 [&>svg]:w-5; }
+  .auth-input { @apply min-h-12 w-full rounded-xl border border-white/10 bg-slate-950/50 py-3 pl-11 pr-4 text-sm text-white placeholder:text-slate-500 transition focus:border-violet-400/70 focus:bg-slate-950/80 focus:outline-none focus:ring-2 focus:ring-violet-400/30; }
+  .auth-primary { @apply inline-flex min-h-12 w-full items-center justify-center rounded-xl bg-gradient-to-r from-violet-500 to-fuchsia-500 px-5 text-sm font-bold text-white shadow-lg shadow-violet-900/40 transition hover:-translate-y-0.5 hover:shadow-violet-700/40 disabled:cursor-not-allowed disabled:opacity-60; }
+  .auth-google { @apply inline-flex min-h-12 w-full items-center justify-center gap-3 rounded-xl border border-white/10 bg-white/[0.06] px-5 text-sm font-bold text-white transition hover:bg-white/[0.1]; }
+  .premium-panel { @apply rounded-3xl border border-slate-200/80 bg-white shadow-sm shadow-slate-200/60; }
 }

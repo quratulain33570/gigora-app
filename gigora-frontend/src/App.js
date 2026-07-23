@@ -5,6 +5,7 @@ import Landing from './pages/Landing';
 import Login from './pages/Login';
 import SeoOptimizer from './pages/SeoOptimizer';
 import Signup from './pages/Signup';
+import AuthCallback from './pages/AuthCallback';
 import { useAuth } from './context/AuthContext';
 
 function ProtectedRoute({ children }) {
@@ -20,10 +21,11 @@ function AuthRoute({ children }) {
 
 function AppRoutes() {
   return <div className="min-h-screen bg-slate-950 font-sans selection:bg-violet-500 selection:text-white"><Routes>
-    <Route path="/" element={<Landing />} />
+    <Route path="/" element={<AuthRoute><Landing /></AuthRoute>} />
     <Route path="/landing" element={<Navigate to="/" replace />} />
     <Route path="/login" element={<AuthRoute><Login /></AuthRoute>} />
     <Route path="/signup" element={<AuthRoute><Signup /></AuthRoute>} />
+    <Route path="/auth/callback" element={<AuthCallback />} />
     <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
     <Route path="/seo" element={<ProtectedRoute><SeoOptimizer /></ProtectedRoute>} />
     <Route path="*" element={<Navigate to="/" replace />} />
