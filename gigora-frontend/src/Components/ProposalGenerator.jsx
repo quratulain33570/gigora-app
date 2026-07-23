@@ -18,7 +18,7 @@ import {
 import { generateProposalApi } from '../services/api';
 import { toast } from 'react-hot-toast';
 
-export default function ProposalGenerator() {
+export default function ProposalGenerator({ onRateLimit, onComplete }) {
   const [jobDescription, setJobDescription] = useState('');
   const [clientName, setClientName] = useState('');
   const [tone, setTone] = useState('Professional');
@@ -56,6 +56,7 @@ export default function ProposalGenerator() {
         coverLetter: data.cover_letter || data.coverLetter || data.proposal || '',
         keyPoints: Array.isArray(data.key_points) ? data.key_points : [],
       });
+      onComplete?.();
 
       // 📱 Smooth scroll to proposal output on mobile devices
       setTimeout(() => {
@@ -63,7 +64,7 @@ export default function ProposalGenerator() {
       }, 100);
 
     } catch (err) {
-      console.error('Proposal API Error:', err);
+      if (err.status === 429) onRateLimit?.();
       setError(err.message || 'Could not connect to backend server. Make sure FastAPI is running! 🚨');
     } finally {
       setLoading(false);

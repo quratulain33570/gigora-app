@@ -19,7 +19,7 @@ import {
 import { optimizeGigSeoApi } from '../services/api';
 import { toast } from 'react-hot-toast';
 
-export default function GigSeoOptimizer() {
+export default function GigSeoOptimizer({ onRateLimit, onComplete }) {
   const [gigTitle, setGigTitle] = useState('');
   const [category, setCategory] = useState('Web Development');
   const [description, setDescription] = useState('');
@@ -86,6 +86,7 @@ export default function GigSeoOptimizer() {
       };
 
       setResults(parsedResults);
+      onComplete?.();
 
       // 📱 Smooth scroll to results on smaller screens
       setTimeout(() => {
@@ -93,7 +94,7 @@ export default function GigSeoOptimizer() {
       }, 100);
 
     } catch (err) {
-      console.error('SEO API Error:', err);
+      if (err.status === 429) onRateLimit?.();
       setError(err.message || 'Could not connect to backend server. Make sure FastAPI is running! 🚨');
     } finally {
       setLoading(false);

@@ -1,64 +1,47 @@
-// 🌐 Centralized API Service for Gigora Backend
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://127.0.0.1:8000';
 
-/**
- * 1️⃣ Optimize Gig SEO
- */
-export const optimizeGigSeoApi = async ({ title, category, description }) => {
-  const response = await fetch(`${API_BASE_URL}/api/seo/optimize`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ title, category, description }),
-  });
+const request = async (path, options = {}) => {
+  const response = await fetch(`${API_BASE_URL}${path}`, options);
 
   if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.detail || 'Failed to optimize Gig SEO 🚨');
+    const body = await response.json().catch(() => ({}));
+    const detail = Array.isArray(body.detail) ? body.detail[0]?.msg : body.detail;
+    const error = new Error(detail || 'Something went wrong.');
+    error.status = response.status;
+    error.remainingUses = body.remaining_uses;
+    throw error;
   }
 
   return response.json();
 };
 
-/**
- * 2️⃣ Generate Proposal
- */
-export const generateProposalApi = async ({ jobDescription, clientName, tone, mySkillHighlight }) => {
-  const response = await fetch(`${API_BASE_URL}/api/proposal/generate`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      job_description: jobDescription,
-      client_name: clientName,
-      tone: tone,
-      skill_highlight: mySkillHighlight,
-    }),
-  });
+export const optimizeGigSeoApi = ({ title, category, description }) => request('/api/seo/optimize', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ title, category, description }),
+});
 
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.detail || 'Failed to generate proposal 🚨');
-  }
+export const generateProposalApi = (payload) => request('/api/proposal/generate', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    job_description: payload?.jobDescription || payload?.job_description || payload || '',
+    client_name: payload?.clientName || payload?.client_name || '',
+    tone: payload?.tone || 'Professional',
+    skill_highlight: payload?.mySkillHighlight || payload?.skill_highlight || '',
+  }),
+});
 
-  return response.json();
-};
+export const analyzeProfileApi = (payload) => request('/api/profile/analyze', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    profile_text: typeof payload === 'string' ? payload : (payload?.profileText || payload?.profile_text || ''),
+    target_role: typeof payload === 'object' ? (payload?.targetRole || '') : '',
+  }),
+});
 
-/**
- * 3️⃣ Analyze Freelancer Profile
- */
-export const analyzeProfileApi = async ({ profileText, targetRole }) => {
-  const response = await fetch(`${API_BASE_URL}/api/profile/analyze`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      profile_text: profileText,
-      target_role: targetRole,
-    }),
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.detail || 'Failed to analyze profile 🚨');
-  }
-
-  return response.json();
-};
+export const getDashboardStatsApi = () => request('/api/dashboard/stats');
+export const getHistoryApi = (limit) => request(`/api/history${limit ? `?limit=${limit}` : ''}`);
+export const deleteHistoryApi = (id) => request(`/api/history/${id}`, { method: 'DELETE' });
+export const getUserProfileApi = () => request('/api/user/profile');

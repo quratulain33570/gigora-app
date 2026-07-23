@@ -2,18 +2,21 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../supabaseClient';
+import GigoraLogoIcon from './Logo'; // 👈 Import your reusable logo component!
 import { 
   UserCheck, 
   Search, 
   FileText, 
+  History,
+  CreditCard,
+  User,
   Home, 
   LogOut, 
-  Sparkles, 
   Menu, 
   X 
 } from 'lucide-react';
 
-export default function DashboardLayout({ children, activeTab, setActiveTab, userName = "Freelancer" }) {
+export default function DashboardLayout({ children, activeTab, setActiveTab, userName = "Freelancer", plan = 'Free' }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -33,6 +36,9 @@ export default function DashboardLayout({ children, activeTab, setActiveTab, use
     { id: 'profile', label: 'Profile Analyzer', icon: UserCheck },
     { id: 'seo', label: 'Gig SEO', icon: Search },
     { id: 'proposal', label: 'Proposal Generator', icon: FileText },
+    { id: 'history', label: 'History', icon: History },
+    { id: 'account', label: 'Profile', icon: User },
+    { id: 'pricing', label: 'Pricing', icon: CreditCard },
   ];
 
   // Safe user initial extraction 👤
@@ -67,7 +73,7 @@ export default function DashboardLayout({ children, activeTab, setActiveTab, use
         {/* Top Header & Scrollable Nav */}
         <div className="flex flex-col h-full overflow-y-auto min-h-0">
           
-          {/* Logo Header */}
+          {/* Logo Header (Clean single logo!) 🚀 */}
           <div className="p-4 sm:p-6 flex items-center justify-between border-b border-gray-100 shrink-0">
             <motion.div 
               whileHover={{ scale: 1.02 }}
@@ -75,12 +81,12 @@ export default function DashboardLayout({ children, activeTab, setActiveTab, use
                 setActiveTab('home');
                 setSidebarOpen(false);
               }}
-              className="flex items-center gap-2 cursor-pointer select-none"
+              className="flex items-center cursor-pointer select-none"
             >
-              <motion.div whileHover={{ rotate: 180, scale: 1.15 }} transition={{ duration: 0.3 }}>
-                <Sparkles className="w-7 h-7 text-primary" />
+              <motion.div whileHover={{ rotate: 12, scale: 1.1 }} transition={{ duration: 0.2 }}>
+                {/* 🌟 Single Logo Component */}
+                <GigoraLogoIcon size="md" />
               </motion.div>
-              <span className="text-2xl font-extrabold text-navy tracking-tight">GIGORA</span>
             </motion.div>
 
             {/* Mobile Close Button */}
@@ -145,8 +151,8 @@ export default function DashboardLayout({ children, activeTab, setActiveTab, use
                 {userInitial}
               </motion.div>
               <div className="overflow-hidden min-w-0 flex-1">
-                <p className="text-sm font-semibold text-navy truncate">{userName}</p>
-                <p className="text-xs text-grayText font-medium truncate">Pro Freelancer</p>
+                <p className="flex items-center gap-1 text-sm font-semibold text-navy truncate">{userName}{plan?.toLowerCase() === 'pro' && <span className="rounded-full bg-emerald-100 px-1.5 py-0.5 text-[10px] font-bold text-emerald-700">PRO</span>}</p>
+                <p className="text-xs text-grayText font-medium truncate">{plan} plan</p>
               </div>
             </motion.div>
 
@@ -171,10 +177,10 @@ export default function DashboardLayout({ children, activeTab, setActiveTab, use
         <header className="lg:hidden bg-white/90 backdrop-blur-md border-b border-gray-100 px-4 py-3 flex items-center justify-between sticky top-0 z-30 shadow-2xs">
           <div 
             onClick={() => setActiveTab('home')}
-            className="flex items-center gap-2 cursor-pointer"
+            className="flex items-center cursor-pointer"
           >
-            <Sparkles className="w-6 h-6 text-primary" />
-            <span className="text-xl font-bold text-navy tracking-tight">GIGORA</span>
+            {/* 🌟 Single Logo Component for Mobile */}
+            <GigoraLogoIcon size="sm" />
           </div>
           <motion.button 
             whileTap={{ scale: 0.9 }}
@@ -186,7 +192,7 @@ export default function DashboardLayout({ children, activeTab, setActiveTab, use
           </motion.button>
         </header>
 
-        {/* Clean Main Container (Transitions managed seamlessly by DashboardPage!) 🌟 */}
+        {/* Clean Main Container */}
         <main className="flex-1 p-4 sm:p-6 md:p-8 lg:p-10 max-w-7xl w-full mx-auto">
           {children}
         </main>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Sparkles, 
@@ -18,11 +18,14 @@ import {
 // 🌐 Import backend API helper
 import { analyzeProfileApi } from '../services/api';
 
-const ProfileAnalyzer = () => {
+const ProfileAnalyzer = ({ onRateLimit, onComplete }) => {
   const [profileText, setProfileText] = useState('');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState('');
+
+  // 📜 Ref for auto-scrolling to results
+  const resultsRef = useRef(null);
 
   // 🎯 Handles form submission & triggers AI Profile evaluation
   const handleAnalyze = async (e) => {
@@ -37,24 +40,46 @@ const ProfileAnalyzer = () => {
       // 🚀 Call FastAPI / AI Backend
       const data = await analyzeProfileApi({ profile_text: profileText });
       
-      setResult({
+      const parsedResult = {
         score: data.score ?? 0,
         strengths: data.strengths || data.goods || [],
         weaknesses: data.weaknesses || data.improvements || [],
         suggestions: data.suggestions || data.recommendations || [],
-      });
+      };
+
+      setResult(parsedResult);
+      onComplete?.();
+
+      // 📜 Smooth scroll to results after render
+      setTimeout(() => {
+        resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+
     } catch (err) {
-      console.error('Profile Analyzer API Error:', err);
+      if (err.status === 429) onRateLimit?.();
       setError(err.message || 'Could not reach the server. Make sure your FastAPI backend is running! 🚨');
     } finally {
       setLoading(false);
     }
   };
 
+  // 🎯 Smooth scroll helper for button
+  const scrollToForm = () => {
+    document.getElementById('audit-form')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  // 🛡️ Helper to safely render string or object points
+  const renderPointText = (item) => {
+    if (typeof item === 'object' && item !== null) {
+      return item.text || item.point || item.description || JSON.stringify(item);
+    }
+    return String(item);
+  };
+
   return (
     <div className="w-full max-w-6xl mx-auto p-4 sm:p-6 space-y-8 relative">
       
-      {/* 1️⃣ TOP HEADER BANNER (Matching your screenshot design! 🎨) */}
+      {/* 1️⃣ TOP HEADER BANNER 🎨 */}
       <div className="bg-white border border-slate-200/80 p-6 sm:p-8 rounded-3xl shadow-xl shadow-slate-200/50 relative overflow-hidden space-y-6">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
           <div className="space-y-2">
@@ -70,12 +95,13 @@ const ProfileAnalyzer = () => {
           </div>
 
           {/* Quick Action Button */}
-          <a 
-            href="#audit-form"
+          <button 
+            type="button"
+            onClick={scrollToForm}
             className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs sm:text-sm rounded-xl shadow-md shadow-indigo-500/20 transition cursor-pointer shrink-0"
           >
             <Zap className="w-4 h-4 fill-current" /> Start Quick Audit
-          </a>
+          </button>
         </div>
 
         {/* Feature Info Cards */}
@@ -106,7 +132,7 @@ const ProfileAnalyzer = () => {
         </div>
       </div>
 
-      {/* 2️⃣ CLICKABLE & INPUT-ABLE FORM CARD 📝 */}
+      {/* 2️⃣ INPUT FORM CARD 📝 */}
       <div id="audit-form" className="bg-white border border-slate-200/80 p-6 sm:p-8 rounded-3xl shadow-xl shadow-slate-200/50 relative z-10 space-y-4">
         <div className="flex items-center gap-2 border-b border-slate-100 pb-4">
           <FileText className="w-5 h-5 text-indigo-600" />
@@ -169,10 +195,11 @@ const ProfileAnalyzer = () => {
       <AnimatePresence>
         {result && !loading && (
           <motion.div 
+            ref={resultsRef}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="space-y-6 relative z-10"
+            className="space-y-6 relative z-10 pt-2"
           >
             {/* Score Hero Card */}
             <div className="bg-gradient-to-r from-indigo-600 via-indigo-700 to-purple-700 text-white p-6 sm:p-8 rounded-3xl shadow-xl text-center space-y-2 relative overflow-hidden">
@@ -204,7 +231,7 @@ const ProfileAnalyzer = () => {
                   {(result.strengths || []).map((item, idx) => (
                     <li key={idx} className="flex items-start gap-2">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-1.5 shrink-0" />
-                      <span>{item}</span>
+                      <span>{renderPointText(item)}</span>
                     </li>
                   ))}
                 </ul>
@@ -222,7 +249,7 @@ const ProfileAnalyzer = () => {
                   {(result.weaknesses || []).map((item, idx) => (
                     <li key={idx} className="flex items-start gap-2">
                       <span className="w-1.5 h-1.5 rounded-full bg-amber-500 mt-1.5 shrink-0" />
-                      <span>{item}</span>
+                      <span>{renderPointText(item)}</span>
                     </li>
                   ))}
                 </ul>
@@ -240,7 +267,7 @@ const ProfileAnalyzer = () => {
                   {(result.suggestions || []).map((item, idx) => (
                     <li key={idx} className="flex items-start gap-2">
                       <span className="w-1.5 h-1.5 rounded-full bg-sky-500 mt-1.5 shrink-0" />
-                      <span>{item}</span>
+                      <span>{renderPointText(item)}</span>
                     </li>
                   ))}
                 </ul>
